@@ -9,63 +9,181 @@
                 background-color:blanchedalmond;
                 outline: dotted;
             }
+
             h2 {
                 outline: auto;
+            }
+
+            .boxbox-container {
+                outline: auto;
+                outline-color:antiquewhite;
+                background-color: blanchedalmond;
+            }
+
+            .boxbox.over {
+                border: 3px dotted #555;
             }
         </style>
     </head>
 
     <body>
         <h1>Unboxed heading</h1>
+        <!-- this box holds all the funky stuff and only has small style changes--> 
         <div class="box1">
-            <p>First Paragraph</p>
-            <h2 id="boxbox">boxed heading inside a box</h2>
-	        <p><br><br><br>Spacceeeesss booiii</p>
+
+            <!-- random text for no reason-->
+            <p>Some boxes inside a dotted box</p>
+
+            <!-- boxbox container can contain a "boxbox" which can be interacted with by the user-->
+            <div class="boxbox-container">
+                hello
+            </div>
+
+            <!-- this heading is interactable with javascript and is called "boxception"-->
+            <h2 id="boxbox">boxed heading inside a box inside a box between two boxes</h2>
+
+            <!-- another container to click and drag the "boxbox" between-->
+            <div class="boxbox-container">Hi </div>
+	        
+            <!-- More nonsense -->
+            <p><br><br><br>Spacceeeesss booiii</p>
         </div>
 
         <script>
+            // Get a boxbox and use it as an object to manipulate
             var boxception = document.getElementById("boxbox");
-            boxception.setAttribute("clicked", -1);
-            console.log(boxception);
-            boxception.innerHTML = "Mouse over here";
+            // Give box box an attribute to track whether or not its been clicked
+            boxception.setAttribute("clicked", false);
 
+            // Defines animation for a boxbox
             const boxSpin = [
                 { transform: 'rotate(0) scale(1)'},
                 { transform: 'rotate(-0.5deg) scale(1)'},
                 { transform: 'rotate(0deg) scale(1)'}
             ];
-
+            // Sets timing for the animation
             const boxSpinTimer = { 
                 duration: 1000, 
                 iterations: 1,
             }
             
+            // When the mouse enters the boxbox animate it and change the text
             boxception.onmouseenter = function() {
                 boxception.innerText = "Mouse over!";
                 boxception.animate(boxSpin, boxSpinTimer);
             }
-
+            // When the mouse leaves make things normal
             boxception.onmouseleave = function() {
-                if (boxception.getAttribute("clicked") == -1) {
+                if (!boxception.getAttribute("clicked")) {
                     boxception.innerText = "Mouse over here";
                 } else {
+                    // If the box has been clicked tell the user that they can turn it off
                     boxception.innerText = "Click to toggle!";
                 }
             }
 
+            // When the box is clicked 
             boxception.onclick = function() {
-                console.log(boxception.getAttribute("clicked"));
-                if (boxception.getAttribute("clicked") == 1) {
+                // Get a list of containers that can be dragged to
+                const containers = document.getElementsByClassName("boxbox-container");
+
+                if (boxception.getAttribute("clicked")) {
+                    // if its "off" make it normal and set the containers to a normal state
                     boxception.draggable = false;
+                    boxception.style.cursor = "auto";
                     boxception.innerText = "Mouse over here";
                     boxception.style.outlineColor = "black";
-                } else {
+
+                    for (let i = 0; i < containers.length; i++) {
+                        //Change color  
+                        containers[i].style.outlineColor = "black";
+                        // Check if a box is contained
+                        if (!containers[i].contains(boxception)) {
+                            containers[i].innerText = "...";
+                        }
+                        
+                    }
+                } 
+                else {
+                    // if its toggled then make everything blue and grab attention
+                    // make it draggable
                     boxception.draggable = true;
+                    boxception.style.cursor = "move"
+                    // Make it visible
                     boxception.innerText = "Drag me!";
                     boxception.style.outlineColor = "blue";
+
+                    for (let i = 0; i < containers.length; i++) {
+                        //Change color
+                        containers[i].style.outlineColor = "blue";
+                        //Check if a box is contained-
+                        if (!containers[i].contains(boxception)) {
+                            containers[i].innerText = "drag to meeee!";
+                        }
+                    }
                 }
-                boxception.setAttribute("clicked", -boxception.getAttribute("clicked"));
+                // After checking everything toggle the box
+                boxception.toggleAttribute("clicked");
             }
+
+            /* Handle dragging of the boxes */ 
+            document.addEventListener('DOMContentLoaded', (event) => {
+
+                function handleDragStart(e) {
+                    this.style.opactive = '0.4'; // Set the opacity to show its being dragged
+
+                    dragSrcEl = this; // Drag Source Element
+
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTranser.setData('text/html', this.innerHTML);
+                }
+
+                function handleDragEnd(e) {
+                    this.style.opacity = '1';
+
+                    items.forEach(function (item) {
+                        item.classList.remove('over');
+                    });
+                }
+
+                function handleDragOver(e) {
+                    e.preventDefault();
+                    return false;
+                }
+
+                function handleDragEnter(e) {
+                    this.classList.add('over'); // Add the class 'over' when starting to drag
+                }
+
+                function handleDragLeave(e) {
+                    this.classList.remove('over');
+                }
+
+                function handleDrop(e) {
+                    e.stopPropagation(); // stops the browser from redirecting
+
+                    // Check what was dropped and set the html of the dropped and the dropped-to
+                    if (dragSrcEl !== this) {
+                        console.log(dragSrcEl);
+                        console.log(this);
+                        dragSrcEl.innerHTML = this.innerHTML;
+                        this.innerHTML = e.dataTransfer.getData('text/html');
+                    }
+
+                    return false;
+                }
+
+                let items = document.querySelectorAll('.boxbox-container .boxbox');
+                items.forEach(function (item) {
+                    item.addEventListener('dragstart', handleDragStart);
+                    item.addEventListener('dragover', handleDragOver);
+                    item.addEventListener('dragenter', handleDragEnter);
+                    item.addEventListener('dragleave', handleDragLeave);
+                    item.addEventListener('dragend', handleDragEnd);
+                    item.addEventListener('drop', handleDrop);
+                });
+            });
+
         </script>
 
     </body>

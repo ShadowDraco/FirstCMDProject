@@ -19,8 +19,54 @@
         <h1>Unboxed heading</h1>
         <div class="box1">
             <p>First Paragraph</p>
-            <h2>boxed heading inside a box</h2>
+            <h2 id="boxbox">boxed heading inside a box</h2>
 	        <p><br><br><br>Spacceeeesss booiii</p>
         </div>
+
+        <script>
+            var boxception = document.getElementById("boxbox");
+            boxception.setAttribute("clicked", -1);
+            console.log(boxception);
+            boxception.innerHTML = "Mouse over here";
+
+            const boxSpin = [
+                { transform: 'rotate(0) scale(1)'},
+                { transform: 'rotate(-0.5deg) scale(1)'},
+                { transform: 'rotate(0deg) scale(1)'}
+            ];
+
+            const boxSpinTimer = { 
+                duration: 1000, 
+                iterations: 1,
+            }
+            
+            boxception.onmouseenter = function() {
+                boxception.innerText = "Mouse over!";
+                boxception.animate(boxSpin, boxSpinTimer);
+            }
+
+            boxception.onmouseleave = function() {
+                if (boxception.getAttribute("clicked") == -1) {
+                    boxception.innerText = "Mouse over here";
+                } else {
+                    boxception.innerText = "Click to toggle!";
+                }
+            }
+
+            boxception.onclick = function() {
+                console.log(boxception.getAttribute("clicked"));
+                if (boxception.getAttribute("clicked") == 1) {
+                    boxception.draggable = false;
+                    boxception.innerText = "Mouse over here";
+                    boxception.style.outlineColor = "black";
+                } else {
+                    boxception.draggable = true;
+                    boxception.innerText = "Drag me!";
+                    boxception.style.outlineColor = "blue";
+                }
+                boxception.setAttribute("clicked", -boxception.getAttribute("clicked"));
+            }
+        </script>
+
     </body>
 </html>

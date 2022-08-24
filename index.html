@@ -126,26 +126,32 @@
             }
 
             /* Handle dragging of the boxes */ 
-            document.addEventListener('DOMContentLoaded', (event) => {
+            document.addEventListener('DOMContentLoaded', (e) => {
 
                 function handleDragStart(e) {
-                    this.style.opactive = '0.4'; // Set the opacity to show its being dragged
+                    this.style.opacity = '0.4'; // Set the opacity to show its being dragged
 
                     dragSrcEl = this; // Drag Source Element
 
                     e.dataTransfer.effectAllowed = 'move';
-                    e.dataTranser.setData('text/html', this.innerHTML);
+                    e.dataTranser.setData('text/html', this);
                 }
 
                 function handleDragEnd(e) {
                     this.style.opacity = '1';
 
-                    items.forEach(function (item) {
-                        item.classList.remove('over');
+                    draggables.forEach(function (draggable) {
+                        draggable.classList.remove('over');
                     });
                 }
 
                 function handleDragOver(e) {
+                    draggables.forEach(function (draggable) {
+                        if (draggable.classList.contains('over')) {
+                            console.log("over");
+                        }
+                    });;
+                    
                     e.preventDefault();
                     return false;
                 }
@@ -161,25 +167,26 @@
                 function handleDrop(e) {
                     e.stopPropagation(); // stops the browser from redirecting
 
-                    // Check what was dropped and set the html of the dropped and the dropped-to
-                    if (dragSrcEl !== this) {
-                        console.log(dragSrcEl);
-                        console.log(this);
-                        dragSrcEl.innerHTML = this.innerHTML;
-                        this.innerHTML = e.dataTransfer.getData('text/html');
-                    }
+                    // Give the draggable to the droppable
+                    droppables.forEach(function (droppable) {
+                        draggables.forEach(function (draggable) {
+                            
+                        });
+                    });
+                    this.innerHTML = e.dataTransfer.getData('text/html');
 
                     return false;
                 }
 
-                let items = document.querySelectorAll('.boxbox-container .boxbox');
-                items.forEach(function (item) {
-                    item.addEventListener('dragstart', handleDragStart);
-                    item.addEventListener('dragover', handleDragOver);
-                    item.addEventListener('dragenter', handleDragEnter);
-                    item.addEventListener('dragleave', handleDragLeave);
-                    item.addEventListener('dragend', handleDragEnd);
-                    item.addEventListener('drop', handleDrop);
+                let draggables = document.querySelectorAll('.boxbox-container .boxbox');
+                let droppables = document.querySelectorAll('.boxbox-container');
+                draggables.forEach(function (draggable) {
+                    draggable.addEventListener('dragstart', handleDragStart);
+                    draggable.addEventListener('dragover', handleDragOver);
+                    draggable.addEventListener('dragenter', handleDragEnter);
+                    draggable.addEventListener('dragleave', handleDragLeave);
+                    draggable.addEventListener('dragend', handleDragEnd);
+                    draggable.addEventListener('drop', handleDrop);
                 });
             });
 
